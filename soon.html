@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>401 - Unauthorized Access</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *:after, *:before {
+            box-sizing: border-box;
+        }
+
+        :root {
+            font-size: 0.75vw;
+            --bg: #1a1a2e;
+            --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            --anime-speed: 0.2s;
+            --total-duration: calc(var(--anime-speed) * 20);
+            --accent: #e94560;
+            --gold: #ffd700;
+            --cow-white: #fefefe;
+        }
+
+        body {
+            height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Stars Background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            animation-delay: var(--delay);
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.8); }
+        }
+
+        /* Moon */
+        .moon {
+            position: absolute;
+            top: 8%;
+            right: 15%;
+            width: 15rem;
+            height: 15rem;
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+            border-radius: 50%;
+            z-index: 1;
+            box-shadow: 0 0 60px rgba(255, 255, 255, 0.3), 
+                       0 0 120px rgba(255, 255, 255, 0.1),
+                       inset -5px -5px 15px rgba(0,0,0,0.1);
+            animation: moonGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes moonGlow {
+            0%, 100% { box-shadow: 0 0 60px rgba(255, 255, 255, 0.3), 0 0 120px rgba(255, 255, 255, 0.1); }
+            50% { box-shadow: 0 0 80px rgba(255, 255, 255, 0.4), 0 0 150px rgba(255, 255, 255, 0.2); }
+        }
+
+        /* Clouds */
+        .clouds {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            filter: blur(20px);
+            animation: cloudFloat var(--cloud-duration) linear infinite;
+        }
+
+        @keyframes cloudFloat {
+            0% { transform: translateX(-20rem); }
+            100% { transform: translateX(120vw); }
+        }
+
+        /* Ground */
+        .ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 35%;
+            background: linear-gradient(180deg, 
+                #2ecc71 0%, 
+                #27ae60 30%, 
+                #1e8449 100%);
+            z-index: 1;
+            clip-path: polygon(0% 25%, 5% 20%, 15% 30%, 25% 15%, 35% 28%, 
+                             45% 18%, 55% 32%, 65% 22%, 75% 28%, 85% 15%, 
+                             95% 25%, 100% 20%, 100% 100%, 0% 100%);
+        }
+
+        .ground::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, 
+                rgba(255,255,255,0.1) 0%, 
+                transparent 50%);
+        }
+
+        /* Fence Posts */
+        .fence {
+            position: absolute;
+            bottom: 30%;
+            left: 0;
+            width: 100%;
+            height: 8rem;
+            z-index: 3;
+        }
+
+        .fence-post {
+            position: absolute;
+            bottom: 0;
+            width: 1.5rem;
+            height: 8rem;
+            background: linear-gradient(90deg, #8B4513, #A0522D);
+            border-radius: 0.5rem 0.5rem 0 0;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .fence-rail {
+            position: absolute;
+            height: 0.8rem;
+            background: linear-gradient(180deg, #A0522D, #8B4513);
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+
+        /* Cow */
+        .cow {
+            width: 30rem;
+            aspect-ratio: 2/1;
+            border-radius: 4rem/15%;
+            background-color: var(--cow-white);
+            position: absolute;
+            top: 40%;
+            z-index: 10;
+            transform-origin: 100% 150%;
+            left: 38%;
+            transform: translateY(15rem) rotate(90deg);
+            animation: jmb var(--anime-speed) linear infinite, 
+                      move calc(var(--anime-speed) * 10) linear forwards;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .cow:before {
+            content: "";
+            position: absolute;
+            left: 11%;
+            top: 0;
+            width: 40%;
+            height: 60%;
+            color: #000;
+            background: currentcolor;
+            border-radius: 0 0 100% 50%;
+            box-shadow: 9rem -2rem 0 -2rem, 15rem -3rem 0 -3rem;
+        }
+
+        .cow:after {
+            content: "";
+            position: absolute;
+            left: 20%;
+            bottom: 6%;
+            color: #000;
+            background: currentcolor;
+            box-shadow: 8rem -4rem 0 -1rem;
+            width: 5rem;
+            aspect-ratio: 1/1;
+            border-radius: 43% 57% 51% 49%/51% 55% 45% 49%;
+        }
+
+        .cow .head {
+            position: absolute;
+            top: 0;
+            left: 100%;
+            z-index: 1;
+        }
+
+        .cow .head .face {
+            width: 11rem;
+            aspect-ratio: 12.5/7.5;
+            background: #fff;
+            box-shadow: -2rem 4.5rem #000 inset;
+            border-radius: 10% 100% 50% 45%/44% 72% 26% 25%;
+            transform: rotateX(180deg) rotate(-55deg) translate(-25%, -55%);
+            position: relative;
+            z-index: 10;
+        }
+
+        .cow .head .face::before {
+            content: "";
+            position: absolute;
+            top: 35%;
+            left: 30%;
+            width: 1.2rem;
+            height: 1.2rem;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0.3rem #000, 2.5rem 0 0 0.3rem #000;
+            z-index: 30;
+            animation: eyeBlink 3s infinite;
+        }
+
+        @keyframes eyeBlink {
+            0%, 45%, 55%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.1); }
+        }
+
+        .cow .head:after, .cow .head:before {
+            content: "";
+            position: absolute;
+            top: -3.5rem;
+            left: -5.5rem;
+            transform: rotate(-25deg);
+            background: #000;
+            width: 4rem;
+            height: 5rem;
+            z-index: 20;
+            box-shadow: 0.2rem 0.1rem 0 0.2rem #fff inset;
+            border-radius: 0% 100% 38% 62%/41% 73% 27% 59%;
+        }
+
+        .cow .head:before {
+            z-index: 2;
+            top: -4rem;
+            left: -5rem;
+            transform: rotate(-5deg);
+        }
+
+        /* Cow Bell */
+        .cow .bell {
+            position: absolute;
+            bottom: 15%;
+            left: 55%;
+            width: 2rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            border-radius: 30% 30% 50% 50%;
+            z-index: 25;
+            animation: bellSwing 0.3s ease-in-out infinite alternate;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        @keyframes bellSwing {
+            0% { transform: rotate(-10deg); }
+            100% { transform: rotate(10deg); }
+        }
+
+        /* Legs */
+        .cow .leg {
+            position: absolute;
+            top: 95%;
+            background: #FFF;
+            width: 1.5rem;
+            height: 3rem;
+            transform-origin: top center;
+        }
+
+        .cow .leg:after {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 90%;
+            width: 100%;
+            height: 2.5rem;
+            background: #FFF;
+            border-bottom: 1.5rem solid #000;
+        }
+
+        .cow .leg.b {
+            left: 4%;
+            animation: legMoveB var(--anime-speed) alternate infinite;
+        }
+
+        .cow .leg.b.l {
+            left: 13%;
+        }
+
+        .cow .leg.b.l:after {
+            left: 10%;
+            top: 75%;
+            background: #FFF;
+            transform: rotate(-5deg);
+        }
+
+        .cow .leg.b.r {
+            animation-delay: var(--anime-speed);
+        }
+
+        .cow .leg.b.r:after {
+            left: 32%;
+            top: 90%;
+            background: #FFF;
+            transform: rotate(-15deg);
+        }
+
+        .cow .leg.f {
+            right: 5%;
+            animation: legMoveF var(--anime-speed) alternate infinite;
+        }
+
+        .cow .leg.f.l {
+            right: 10%;
+            animation-delay: var(--anime-speed);
+        }
+
+        .cow .leg.f.l:after {
+            right: 10%;
+            left: auto;
+            top: 75%;
+            background: #FFF;
+            transform: rotate(5deg);
+        }
+
+        .cow .leg.f.r:after {
+            right: 20%;
+            left: auto;
+            top: 90%;
+            background: #FFF;
+            transform: rotate(10deg);
+        }
+
+        /* Tail */
+        .cow .tail {
+            position: absolute;
+            right: 98%;
+            top: 12%;
+            width: 2rem;
+            height: 10rem;
+            border-left: 0.5rem solid #fff;
+            border-top: 0.5rem solid #fff;
+            border-radius: 100% 0% 51% 49%/42% 100% 0% 58%;
+            transform-origin: top left;
+            animation: tail 0.75s alternate infinite;
+        }
+
+        .cow .tail:after {
+            content: "";
+            position: absolute;
+            left: 7%;
+            top: 100%;
+            background: #000;
+            width: 1.5rem;
+            height: 1.75rem;
+            border-radius: 70% 30% 100% 0%/100% 30% 70% 0%;
+            transform: rotate(-60deg);
+        }
+
+        /* Well */
+        .well {
+            background: #2c3e50;
+            width: 30rem;
+            height: 2.5rem;
+            position: absolute;
+            top: calc(40% + 19rem);
+            left: 60%;
+            border-radius: 50%;
+            z-index: 8;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5), 
+                       0 0 0 0.5rem #1a252f,
+                       0 0 0 1rem #2c3e50;
+        }
+
+        .well:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0%;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 -1.2rem 0.25rem #000 inset;
+            z-index: 110;
+        }
+
+        .well::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 24rem;
+            background: linear-gradient(180deg, transparent 0%, var(--bg) 100%);
+            z-index: 100;
+        }
+
+        /* Well Bucket */
+        .well-bucket {
+            position: absolute;
+            top: -80%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4rem;
+            height: 5rem;
+            background: linear-gradient(135deg, #8B4513, #654321);
+            border-radius: 30% 30% 50% 50%;
+            z-index: 6;
+            animation: bucketSwing 2s ease-in-out infinite;
+            border: 0.3rem solid #654321;
+        }
+
+        .well-bucket::before {
+            content: '';
+            position: absolute;
+            top: -1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0.2rem;
+            height: 1.5rem;
+            background: #666;
+        }
+
+        @keyframes bucketSwing {
+            0%, 100% { transform: translateX(-50%) rotate(-5deg); }
+            50% { transform: translateX(-50%) rotate(5deg); }
+        }
+
+        /* Home Button - Clean, no blur, fixed hover */
+        .home-btn {
+            position: absolute;
+            left: -190%;
+            top: 2rem;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #000;
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            display: inline-block;
+            text-decoration: none;
+            padding: 1.5rem 3.5rem;
+            border-radius: 5rem;
+            transform-origin: 45rem 45rem;
+            animation: btnAnim calc(var(--anime-speed) * 20) linear forwards;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            z-index: 120;
+            opacity: 0;
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .home-btn:hover {
+            background: linear-gradient(135deg, #ffed4a, #ffb347);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+        }
+
+        .home-btn:active {
+            background: linear-gradient(135deg, #ffa500, #ff8c00);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Text Box */
+        .text-box {
+            font-family: "Cabin Sketch", serif;
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            position: absolute;
+            left: 10%;
+            top: 28%;
+            animation: textAnim calc(var(--anime-speed) * 18) linear forwards;
+            z-index: 20;
+        }
+
+        .text-box h1 {
+            font-size: 20rem;
+            margin: 0;
+            line-height: 16rem;
+            background: linear-gradient(135deg, #e94560, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            filter: drop-shadow(0 5px 15px rgba(233, 69, 96, 0.4));
+        }
+
+        .text-box p {
+            width: 42rem;
+            font-size: 4.5rem;
+            line-height: 1.2;
+            margin: 1rem 0 0;
+            color: #ffffff;
+            text-shadow: 0 3px 10px rgba(0,0,0,0.5);
+        }
+
+        /* Splash Effect */
+        .splash {
+            position: absolute;
+            top: calc(40% + 19rem);
+            left: 60%;
+            transform: translate(-50%, -50%);
+            z-index: 105;
+            pointer-events: none;
+            opacity: 0;
+            animation: splashAnim calc(var(--anime-speed) * 20) linear forwards;
+        }
+
+        .splash-drop {
+            position: absolute;
+            width: 1rem;
+            height: 1rem;
+            background: #4fc3f7;
+            border-radius: 50%;
+            animation: dropFly 0.5s ease-out forwards;
+        }
+
+        @keyframes splashAnim {
+            0%, 92% { opacity: 0; }
+            93% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes dropFly {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        /* Keyframes - Clean button animation */
+        @keyframes btnAnim {
+            0%, 55% {
+                transform: translateX(-10rem) rotate(95deg);
+                opacity: 0;
+            }
+            60% {
+                transform: translateX(-5rem) rotate(45deg);
+                opacity: 0.5;
+            }
+            65% {
+                transform: translateX(-2rem) rotate(10deg);
+                opacity: 0.8;
+            }
+            70%, 100% {
+                transform: translateX(0rem) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes textAnim {
+            0%, 60% {
+                top: 0%;
+                transform: translatey(0);
+                opacity: 0;
+            }
+            70%, 76%, 85% {
+                top: 28%;
+                transform: translatey(5%);
+                opacity: 1;
+            }
+            73%, 79% {
+                top: 28%;
+                transform: translatey(-15%);
+                opacity: 1;
+            }
+            100% {
+                top: 28%;
+                transform: translatey(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes move {
+            0% {
+                left: -10%;
+                transform: translateY(0) rotate(0deg);
+            }
+            85% {
+                left: 38%;
+                transform: translateY(0) rotate(0deg);
+            }
+            90% {
+                left: 40%;
+                transform: translateY(0) rotate(5deg);
+            }
+            95% {
+                left: 38%;
+                transform: translateY(0) rotate(90deg);
+            }
+            100% {
+                left: 38%;
+                transform: translateY(15rem) rotate(90deg);
+            }
+        }
+
+        @keyframes jmb {
+            0%, 100% {
+                transform: translatey(0);
+            }
+            50% {
+                transform: translatey(5px);
+            }
+        }
+
+        @keyframes legMoveB {
+            0% {
+                transform: rotate(2deg) translatey(0%);
+            }
+            100% {
+                transform: rotate(-5deg) translatey(-5%);
+            }
+        }
+
+        @keyframes legMoveF {
+            0% {
+                transform: rotate(0deg) translatey(0%);
+            }
+            100% {
+                transform: rotate(-15deg) translatey(-5%);
+            }
+        }
+
+        @keyframes tail {
+            0% {
+                transform: rotate(3deg);
+                height: 10rem;
+            }
+            100% {
+                transform: rotate(-3deg);
+                height: 8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Stars -->
+    <div class="stars" id="stars"></div>
+
+    <!-- Moon -->
+    <div class="moon"></div>
+
+    <!-- Clouds -->
+    <div class="clouds" id="clouds"></div>
+
+    <!-- Ground -->
+    <div class="ground"></div>
+
+    <!-- Fence -->
+    <div class="fence" id="fence"></div>
+
+    <!-- Cow -->
+    <div class="cow">
+        <div class="head">
+            <div class="face"></div>
+        </div>
+        <div class="bell"></div>
+        <div class="leg b l"></div>
+        <div class="leg b r"></div>
+        <div class="leg f l"></div>
+        <div class="leg f r"></div>
+        <div class="tail"></div>
+    </div>
+
+    <!-- Well with Bucket and Button -->
+    <div class="well">
+        <div class="well-bucket"></div>
+        <a href="/" class="home-btn"> Go Home</a>
+    </div>
+
+    <!-- Splash Effect -->
+    <div class="splash" id="splash"></div>
+
+    <!-- Text Box -->
+    <div class="text-box">
+        <h1>401</h1>
+        <p>Sorry, You don't have access there...</p>
+    </div>
+
+    <script>
+        // Generate Stars
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                const size = Math.random() * 3 + 1;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
+                star.style.setProperty('--delay', Math.random() * 3 + 's');
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Generate Clouds
+        function createClouds() {
+            const cloudsContainer = document.getElementById('clouds');
+            for (let i = 0; i < 5; i++) {
+                const cloud = document.createElement('div');
+                cloud.className = 'cloud';
+                cloud.style.top = Math.random() * 30 + 5 + '%';
+                cloud.style.width = Math.random() * 30 + 20 + 'rem';
+                cloud.style.height = Math.random() * 10 + 5 + 'rem';
+                cloud.style.setProperty('--cloud-duration', Math.random() * 20 + 20 + 's');
+                cloud.style.animationDelay = Math.random() * 10 + 's';
+                cloudsContainer.appendChild(cloud);
+            }
+        }
+
+        // Generate Fence
+        function createFence() {
+            const fenceContainer = document.getElementById('fence');
+            for (let i = 0; i < 20; i++) {
+                const post = document.createElement('div');
+                post.className = 'fence-post';
+                post.style.left = (i * 5) + '%';
+                fenceContainer.appendChild(post);
+            }
+            
+            // Add rails
+            for (let i = 0; i < 2; i++) {
+                const rail = document.createElement('div');
+                rail.className = 'fence-rail';
+                rail.style.top = (2 + i * 2.5) + 'rem';
+                rail.style.left = '0';
+                rail.style.width = '100%';
+                fenceContainer.appendChild(rail);
+            }
+        }
+
+        // Generate Splash
+        function createSplash() {
+            const splashContainer = document.getElementById('splash');
+            for (let i = 0; i < 20; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'splash-drop';
+                drop.style.left = '50%';
+                drop.style.top = '50%';
+                drop.style.setProperty('--tx', (Math.random() - 0.5) * 15 + 'rem');
+                drop.style.setProperty('--ty', (Math.random() - 0.5) * 15 + 'rem');
+                drop.style.animationDelay = Math.random() * 0.3 + 's';
+                splashContainer.appendChild(drop);
+            }
+        }
+
+        // Initialize
+        createStars();
+        createClouds();
+        createFence();
+        createSplash();
+
+        // Reset animation on click (for demo purposes)
+        document.addEventListener('click', (e) => {
+            // Don't reset if clicking the button
+            if (e.target.classList.contains('home-btn')) return;
+            
+            const cow = document.querySelector('.cow');
+            const text = document.querySelector('.text-box');
+            const button = document.querySelector('.home-btn');
+            const splash = document.querySelector('.splash');
+            
+            // Reset all animations
+            cow.style.animation = 'none';
+            text.style.animation = 'none';
+            button.style.animation = 'none';
+            splash.style.animation = 'none';
+            
+            // Force reflow
+            cow.offsetHeight;
+            text.offsetHeight;
+            button.offsetHeight;
+            splash.offsetHeight;
+            
+            // Restart animations with proper timing
+            cow.style.animation = 'jmb 0.2s linear infinite, move 2s linear forwards';
+            text.style.animation = 'textAnim 3.6s linear forwards';
+            button.style.animation = 'btnAnim 4s linear forwards';
+            splash.style.animation = 'splashAnim 4s linear forwards';
+        });
+    </script>
+</body>
+</html>
