@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <meta name="description" content="Wilson Benjamini - Creative Developer Portfolio | UI/UX Designer & System Analyst">
+    <meta name="description" content="Wilson Benjamini - Information Systems Specialist | Creative Developer Portfolio">
     <meta name="theme-color" content="#0a0a0f">
-    <title>Wilson Benjamini | Creative Developer</title>
+    <title>Wilson Benjamini · Information Systems Specialist</title>
     
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Devicon -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+    <!-- html2pdf for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
@@ -137,6 +139,9 @@
             color: var(--text-primary); font-size: 1rem;
         }
 
+        .btn-cv { background: var(--gradient-2); color: white; border: none; }
+        .btn-cv:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(124,92,252,0.4); }
+
         /* Hero */
         .hero {
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
@@ -224,6 +229,22 @@
         .project-links { display: flex; gap: 0.75rem; }
         .project-links a { color: white; text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 0.3rem; }
 
+        /* Course Clusters */
+        .course-clusters { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.2rem; margin-top: 1.5rem; }
+        .cluster-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.2rem 1.4rem; backdrop-filter: blur(10px); transition: all 0.2s ease; }
+        .cluster-card:hover { transform: translateY(-3px); border-color: var(--accent-primary); }
+        .cluster-card h4 { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.5rem; }
+        .cluster-card h4 i { color: var(--accent-secondary); }
+        .cluster-card ul { list-style: none; padding: 0; }
+        .cluster-card ul li { font-size: 0.8rem; color: var(--text-secondary); padding: 0.15rem 0; display: flex; align-items: baseline; gap: 0.3rem; }
+        .cluster-card ul li::before { content: "▹"; color: var(--accent-primary); font-size: 0.6rem; }
+
+        /* Certificates */
+        .cert-grid { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1rem; }
+        .cert-item { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem; border-radius: 50px; background: rgba(124,92,252,0.08); border: 1px solid rgba(124,92,252,0.15); font-size: 0.8rem; color: var(--text-secondary); }
+        .cert-item i { color: #f5b342; font-size: 0.85rem; }
+        .cert-item .cert-org { color: var(--text-tertiary); font-size: 0.7rem; margin-left: 0.1rem; }
+
         /* Contact */
         .contact-section { background: var(--bg-secondary); padding: 5rem 2rem; text-align: center; }
         .contact-circle { display: inline-block; position: relative; padding: 4rem 3rem; }
@@ -309,6 +330,7 @@
             .chat-widget { width: calc(100vw - 2rem); right: 1rem; bottom: 5rem; height: 460px; border-radius: 16px; }
             .floating-btns { bottom: 1.5rem; right: 1rem; }
             .float-btn { width: 46px; height: 46px; font-size: 1.1rem; }
+            .course-clusters { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 480px) {
             html { font-size: 14px; }
@@ -317,12 +339,40 @@
             .profile-card, .card { padding: 1.25rem; }
             .profile-photo { width: 100px; height: 100px; }
             .projects-grid { grid-template-columns: 1fr; }
+            .course-clusters { grid-template-columns: 1fr; }
         }
+
+        /* ===== HIDDEN CV CONTENT (for PDF) ===== */
+        #cvContent {
+            display: none;
+        }
+
+        .loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(8, 12, 18, 0.85); backdrop-filter: blur(6px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 9999; flex-direction: column; gap: 1.5rem;
+        }
+        .loader-overlay.active { display: flex; }
+        .loader-overlay .spinner {
+            width: 48px; height: 48px;
+            border: 4px solid rgba(0, 200, 200, 0.1);
+            border-top: 4px solid #00c8c8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .loader-overlay p { color: #b0c8d8; font-size: 1.1rem; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
     <div class="bg-grid"></div>
     <div class="overlay" id="overlay"></div>
+
+    <!-- Loader -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="spinner"></div>
+        <p><i class="fas fa-file-pdf" style="color:#00c8c8;"></i> Generating your CV ...</p>
+    </div>
 
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
@@ -331,6 +381,7 @@
             <ul class="nav-links">
                 <li><a href="#home"><i class="fas fa-house"></i> Home</a></li>
                 <li><a href="#about"><i class="fas fa-user"></i> About</a></li>
+                <li><a href="#courses"><i class="fas fa-book-open"></i> Courses</a></li>
                 <li><a href="#projects"><i class="fas fa-code"></i> Projects</a></li>
                 <li><a href="#contact"><i class="fas fa-paper-plane"></i> Contact</a></li>
             </ul>
@@ -347,6 +398,7 @@
     <div class="mobile-menu" id="mobileMenu">
         <a href="#home"><i class="fas fa-house"></i> Home</a>
         <a href="#about"><i class="fas fa-user"></i> About</a>
+        <a href="#courses"><i class="fas fa-book-open"></i> Courses</a>
         <a href="#projects"><i class="fas fa-code"></i> Projects</a>
         <a href="#contact"><i class="fas fa-paper-plane"></i> Contact</a>
     </div>
@@ -362,17 +414,18 @@
                 <i class="fas fa-circle"></i> Available for Opportunities
             </div>
             <h1 class="hero-title">
-                Creative<br><span class="gradient-text">Developer</span>
+                Wilson <span class="gradient-text">Benjamini</span>
             </h1>
             <p class="hero-subtitle">
-                <i class="fas fa-code"></i> Building Digital Experiences <i class="fas fa-palette"></i>
+                <i class="fas fa-laptop-code"></i> Information Systems Specialist <i class="fas fa-database"></i>
             </p>
             <p class="hero-location">
-                <i class="fas fa-location-dot"></i> Dodoma, Tanzania
+                <i class="fas fa-location-dot"></i> Dodoma, Tanzania &bull; <i class="fas fa-graduation-cap"></i> BSc Information Systems
             </p>
             <div class="hero-actions">
                 <a href="#projects" class="btn btn-primary"><i class="fas fa-eye"></i> View Work</a>
                 <a href="#contact" class="btn btn-outline"><i class="fas fa-comment"></i> Get In Touch</a>
+                <button class="btn btn-cv" id="downloadCvBtn"><i class="fas fa-file-pdf"></i> Download CV</button>
             </div>
         </div>
     </section>
@@ -382,7 +435,7 @@
         <div class="section-container">
             <div class="section-header">
                 <div class="section-tag"><i class="fas fa-id-card"></i> About Me</div>
-                <h2 class="section-title">Personal Details</h2>
+                <h2 class="section-title">Information Systems Specialist</h2>
             </div>
             <div class="about-grid">
                 <div class="profile-card">
@@ -390,15 +443,15 @@
                         <img src="photo.jpg" alt="Wilson Benjamini" onerror="this.style.background='var(--gradient-1)'; this.style.display='block';">
                     </div>
                     <div class="profile-name">Wilson Benjamini</div>
-                    <div class="profile-role">UI/UX Designer & System Analyst</div>
+                    <div class="profile-role">UI/UX Designer &amp; System Analyst</div>
                     <div class="profile-info">
                         <div class="profile-info-item"><i class="fas fa-location-dot"></i><span>Dodoma, Tanzania</span></div>
                         <div class="profile-info-item"><i class="fas fa-envelope"></i><span>benjaminiw379@gmail.com</span></div>
-                        <div class="profile-info-item"><i class="fas fa-phone"></i><span>+255 799 505 563</span></div>
+                        <div class="profile-info-item"><i class="fas fa-phone"></i><span>+255 679 950 563</span></div>
                         <div class="profile-info-item"><i class="fas fa-calendar"></i><span>December 26, 1999</span></div>
                         <div class="profile-info-item"><i class="fas fa-globe"></i><span>Tanzanian</span></div>
-                        <div class="profile-info-item"><i class="fas fa-language"></i><span>English, Swahili</span></div>
-                        <div class="profile-info-item"><i class="fas fa-graduation-cap"></i><span>B.S. Information Systems</span></div>
+                        <div class="profile-info-item"><i class="fas fa-language"></i><span>English (Fluent), Kiswahili (Basic)</span></div>
+                        <div class="profile-info-item"><i class="fas fa-graduation-cap"></i><span>BSc Information Systems · UDOM</span></div>
                     </div>
                     <div class="profile-social">
                         <a href="https://www.linkedin.com/feed/" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
@@ -410,29 +463,42 @@
                 <div class="content-stack">
                     <div class="card">
                         <div class="card-header"><i class="fas fa-quote-right"></i> Professional Summary</div>
-                        <p>Passionate developer with 2+ years of experience crafting beautiful, performant web applications integrated with AI. Specializing in Laravel and Alpine.js, I transform complex ideas into elegant, maintainable solutions.</p>
+                        <p>Background in Information Systems with hands-on experience in UI/UX design, web development, and data analysis. Passionate about building digital solutions that are not only functional but also human‑centered. Strong leadership and communication skills, with a track record of bridging technical teams and business goals.</p>
                     </div>
                     <div class="card">
                         <div class="card-header"><i class="fas fa-microchip"></i> Technical Skills</div>
                         <div class="skills-grid">
+                            <span class="skill-tag"><i class="devicon-python-plain colored"></i> Python</span>
+                            <span class="skill-tag"><i class="devicon-java-plain colored"></i> Java</span>
+                            <span class="skill-tag"><i class="fas fa-database"></i> SQL / DBMS</span>
                             <span class="skill-tag"><i class="devicon-html5-plain colored"></i> HTML5</span>
                             <span class="skill-tag"><i class="devicon-css3-plain colored"></i> CSS3</span>
                             <span class="skill-tag"><i class="devicon-javascript-plain colored"></i> JavaScript</span>
-                            <span class="skill-tag"><i class="devicon-react-original colored"></i> React</span>
-                            <span class="skill-tag"><i class="devicon-python-plain colored"></i> Python</span>
-                            <span class="skill-tag"><i class="devicon-amazonwebservices-plain colored"></i> AWS</span>
-                            <span class="skill-tag"><i class="devicon-mongodb-plain colored"></i> MongoDB</span>
-                            <span class="skill-tag"><i class="devicon-postgresql-plain colored"></i> PostgreSQL</span>
-                            <span class="skill-tag"><i class="devicon-git-plain colored"></i> Git</span>
+                            <span class="skill-tag"><i class="fas fa-chart-pie"></i> Data Analysis</span>
+                            <span class="skill-tag"><i class="fas fa-brain"></i> Machine Learning</span>
+                            <span class="skill-tag"><i class="fas fa-shield-halved"></i> Ethical Hacking</span>
+                            <span class="skill-tag"><i class="fas fa-network-wired"></i> Networking / Linux</span>
+                            <span class="skill-tag"><i class="fas fa-server"></i> Systems Analysis</span>
+                            <span class="skill-tag"><i class="fas fa-project-diagram"></i> Project Management</span>
+                            <span class="skill-tag"><i class="fas fa-pen-fancy"></i> UI/UX Design</span>
+                            <span class="skill-tag"><i class="fas fa-bullhorn"></i> Digital Marketing</span>
+                            <span class="skill-tag"><i class="fas fa-people-arrows"></i> Leadership</span>
+                            <span class="skill-tag"><i class="fas fa-cube"></i> E‑Governance / ERP</span>
+                            <span class="skill-tag"><i class="fas fa-flask"></i> Research Methods</span>
                         </div>
                     </div>
                     <div class="card">
-                        <div class="card-header"><i class="fas fa-briefcase"></i> Experience</div>
+                        <div class="card-header"><i class="fas fa-briefcase"></i> Work Experience</div>
                         <div class="timeline">
                             <div class="timeline-item">
-                                <div class="timeline-date">2026 - Present</div>
-                                <div class="timeline-title">Frontend Developer</div>
-                                <div class="timeline-desc">Enterprise SaaS platform serving 50K+ users. Implemented micro-frontend architecture improving deployment by 60%.</div>
+                                <div class="timeline-date">2024 - Present</div>
+                                <div class="timeline-title">Lushtoto District Council</div>
+                                <div class="timeline-desc">Developed and maintained networking infrastructure. Led troubleshooting of systems and monitored infrastructure consistency.</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">2023 - 2024</div>
+                                <div class="timeline-title">University of Dodoma (UDOM)</div>
+                                <div class="timeline-desc">Industrial Practical Training — Developed complete project from title to full system implementation.</div>
                             </div>
                         </div>
                     </div>
@@ -441,12 +507,63 @@
                         <div class="timeline">
                             <div class="timeline-item">
                                 <div class="timeline-date">2023 - 2026</div>
-                                <div class="timeline-title">B.S. Information Systems</div>
-                                <div class="timeline-desc">Specialized in software engineering and systems analysis.</div>
+                                <div class="timeline-title">BSc Information Systems</div>
+                                <div class="timeline-desc">University of Dodoma · Specialized in software engineering and systems analysis.</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">2019 - 2022</div>
+                                <div class="timeline-title">Advanced Level (Div II)</div>
+                                <div class="timeline-desc">Bihawana SS, Dodoma</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">2016 - 2019</div>
+                                <div class="timeline-title">Secondary (Div II)</div>
+                                <div class="timeline-desc">Malibwi SS</div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Courses -->
+    <section class="section" id="courses">
+        <div class="section-container">
+            <div class="section-header">
+                <div class="section-tag"><i class="fas fa-book-open"></i> Academic Background</div>
+                <h2 class="section-title">Course Clusters</h2>
+                <p style="color: var(--text-secondary); max-width: 600px; margin: 0.5rem auto 0;">Over 40+ courses spanning programming, databases, networking, security, data science, business systems, and research.</p>
+            </div>
+            <div class="course-clusters">
+                <div class="cluster-card"><h4><i class="fas fa-code"></i> Programming</h4><ul><li>Principles of Programming Languages</li><li>High Level Programming</li><li>Object Oriented Programming in Java</li><li>Internet Programming I &amp; II</li><li>Mobile Applications Development</li></ul></div>
+                <div class="cluster-card"><h4><i class="fas fa-database"></i> Databases &amp; Data</h4><ul><li>Introduction to Database Systems</li><li>Database Management Systems</li><li>Advanced Data Wrangling with SQL</li><li>Database Operations for Data Analysis</li><li>Business Intelligence &amp; Data Viz</li></ul></div>
+                <div class="cluster-card"><h4><i class="fas fa-network-wired"></i> Networks &amp; OS</h4><ul><li>Introduction to Computer Networking</li><li>Introduction to Linux/Unix Systems</li><li>Operating Systems</li><li>Infrastructure Troubleshooting</li></ul></div>
+                <div class="cluster-card"><h4><i class="fas fa-shield-halved"></i> Security &amp; Ethics</h4><ul><li>Introduction to IT Security</li><li>ICT Laws and Ethics</li><li>IT Governance and Compliance</li><li>Ethically Hack the Planet (cert.)</li></ul></div>
+                <div class="cluster-card"><h4><i class="fas fa-chart-line"></i> Data Science &amp; Analytics</h4><ul><li>Statistical Modeling &amp; Inference</li><li>Predictive Analytics &amp; Forecasting</li><li>Machine Learning Foundations</li><li>Applied ML I &amp; II</li><li>Model Tuning &amp; Evaluation</li></ul></div>
+                <div class="cluster-card"><h4><i class="fas fa-building"></i> Business &amp; Strategy</h4><ul><li>Business Information Systems</li><li>Information Systems Strategy</li><li>E‑Governance IS</li><li>Decision Support Systems</li><li>Strategic Management</li><li>ICT Entrepreneurship</li></ul></div>
+                <div class="cluster-card"><h4><i class="fas fa-flask"></i> Research &amp; Ops</h4><ul><li>ICT Research Methods</li><li>Operation Research for Business</li><li>Statistics for Information Analysis</li><li>User Research &amp; Problem Discovery</li></ul></div>
+                <div class="cluster-card"><h4><i class="fas fa-tasks"></i> Systems &amp; Management</h4><ul><li>Systems Analysis &amp; Design</li><li>ICT Project Management</li><li>Design &amp; Management of Enterprise Systems</li><li>Organizational Behavior</li><li>Knowledge Management Systems</li></ul></div>
+                <div class="cluster-card"><h4><i class="fas fa-globe"></i> Core &amp; Foundations</h4><ul><li>Introduction to Information Systems</li><li>ICT for Development</li><li>Communication Skills</li><li>Principles &amp; Practices of Management</li><li>Discrete Mathematics for ICT</li></ul></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Certificates -->
+    <section class="section" style="padding-top: 0;">
+        <div class="section-container">
+            <div class="section-header">
+                <div class="section-tag"><i class="fas fa-certificate"></i> Certifications</div>
+                <h2 class="section-title">Professional Certificates</h2>
+            </div>
+            <div class="cert-grid">
+                <span class="cert-item"><i class="fas fa-robot"></i> AI Fundamentals <span class="cert-org">· Google</span></span>
+                <span class="cert-item"><i class="fas fa-brain"></i> ML with Python <span class="cert-org">· IBM</span></span>
+                <span class="cert-item"><i class="fab fa-python"></i> Python for Data Science <span class="cert-org">· IBM</span></span>
+                <span class="cert-item"><i class="fas fa-chart-simple"></i> Foundations: Data <span class="cert-org">· Google</span></span>
+                <span class="cert-item"><i class="fas fa-chart-pie"></i> Visualize Data with PPT <span class="cert-org">· Coursera</span></span>
+                <span class="cert-item"><i class="fas fa-file-excel"></i> Getting Started with Excel <span class="cert-org">· Coursera</span></span>
+                <span class="cert-item"><i class="fas fa-skull"></i> Ethically Hack the Planet <span class="cert-org">· Cyber</span></span>
             </div>
         </div>
     </section>
@@ -456,21 +573,22 @@
         <div class="section-container">
             <div class="section-header">
                 <div class="section-tag"><i class="fas fa-star"></i> Portfolio</div>
-                <h2 class="section-title">Recent Projects</h2>
+                <h2 class="section-title">Featured Project</h2>
             </div>
             <div class="projects-grid">
                 <div class="project-card">
-                    <div class="project-card-bg"></div>
+                    <div class="project-card-bg" style="background: linear-gradient(135deg, #7c5cfc, #ff3366);"></div>
                     <div class="project-card-content">
-                        <h3>Data Visualization Platform</h3>
-                        <p>Real-time analytics dashboard with interactive charts and customizable reports.</p>
+                        <h3><i class="fas fa-robot"></i> Smart Home Cleaner Request Management System</h3>
+                        <p>Full-stack system for managing smart home cleaning requests · UI/UX + backend · Built with Python, JavaScript, and SQL.</p>
                         <div class="project-tags">
-                            <span class="project-tag"><i class="fas fa-chart-bar"></i> D3.js</span>
-                            <span class="project-tag"><i class="devicon-python-plain"></i> Python</span>
+                            <span class="project-tag"><i class="fas fa-code"></i> Python</span>
+                            <span class="project-tag"><i class="fas fa-database"></i> SQL</span>
+                            <span class="project-tag"><i class="fab fa-js"></i> JavaScript</span>
                         </div>
                         <div class="project-links">
-                            <a href="#"><i class="fas fa-arrow-up-right-from-square"></i> Demo</a>
-                            <a href="#"><i class="fab fa-github"></i> Code</a>
+                            <a href="https://github.com/Firstborn-tz" target="_blank"><i class="fab fa-github"></i> View on GitHub</a>
+                            <a href="#"><i class="fas fa-arrow-up-right-from-square"></i> Live Demo</a>
                         </div>
                     </div>
                 </div>
@@ -497,7 +615,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2026 Wilson Benjamini &bull; Crafted with <i class="fas fa-heart"></i> and <i class="fas fa-mug-hot"></i> &bull; Powered by <i class="fab fa-google"></i> Gemini AI</p>
+        <p>&copy; 2026 Wilson Benjamini &bull; Crafted with <i class="fas fa-heart"></i> and <i class="fas fa-mug-hot"></i> &bull; BSc Information Systems</p>
     </footer>
 
     <!-- Floating Buttons -->
@@ -516,7 +634,7 @@
             <div class="chat-avatar-small"><i class="fas fa-headset"></i></div>
             <div>
                 <strong style="font-size:0.9rem;">Wilson's AI Assistant</strong>
-                <small style="display:block;opacity:0.8;font-size:0.7rem;"><i class="fab fa-google"></i> Powered by codeforge</small>
+                <small style="display:block;opacity:0.8;font-size:0.7rem;"><i class="fab fa-google"></i> Powered by Gemini</small>
             </div>
             <button style="margin-left:auto;background:none;border:none;color:white;cursor:pointer;font-size:1rem;" onclick="closeChat()">
                 <i class="fas fa-times"></i>
@@ -525,14 +643,14 @@
         <div class="chat-widget-body" id="chatBody">
             <div class="chat-msg bot">
                 <div class="chat-msg-avatar"><i class="fas fa-headset"></i></div>
-                <div class="chat-msg-content">Hello! <i class="fas fa-hand-sparkles"></i> I'm Wilson's AI assistant powered by Google Gemini. Ask me about Wilson's skills, experience, or anything you'd like to know!</div>
+                <div class="chat-msg-content">Hello! <i class="fas fa-hand-sparkles"></i> I'm Wilson's AI assistant. Ask me about his skills, experience, courses, or anything you'd like to know!</div>
             </div>
         </div>
         <div class="chat-quick-actions">
             <button class="chat-quick-btn" onclick="quickAsk('What skills does Wilson have?')"><i class="fas fa-code"></i> Skills</button>
             <button class="chat-quick-btn" onclick="quickAsk('Tell me about Wilson experience')"><i class="fas fa-briefcase"></i> Experience</button>
+            <button class="chat-quick-btn" onclick="quickAsk('What courses did Wilson take?')"><i class="fas fa-book"></i> Courses</button>
             <button class="chat-quick-btn" onclick="quickAsk('How can I contact Wilson?')"><i class="fas fa-envelope"></i> Contact</button>
-            <button class="chat-quick-btn" onclick="quickAsk('What is artificial intelligence?')"><i class="fas fa-brain"></i> General</button>
         </div>
         <div class="chat-input-wrap">
             <input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything..." onkeypress="if(event.key==='Enter') sendMessage()">
@@ -540,112 +658,219 @@
         </div>
     </div>
 
+    <!-- ===== HIDDEN CV CONTENT (for PDF generation) ===== -->
+    <div id="cvContent" style="display: none;">
+        <div style="max-width: 900px; margin: 0 auto; background: #12121a; color: #e4edf2; padding: 2.5rem 3rem; border-radius: 24px; border: 1px solid rgba(255,255,255,0.06); font-family: 'Inter', 'Segoe UI', sans-serif;">
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; border-bottom: 2px solid rgba(255,51,102,0.15); padding-bottom: 1.2rem; margin-bottom: 1.5rem;">
+                <div>
+                    <h1 style="font-size: 2.8rem; font-weight: 700; margin: 0; background: linear-gradient(135deg, #ff3366, #7c5cfc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Wilson Benjamini</h1>
+                    <div style="font-size: 1.1rem; color: #a0a0b8;"><i class="fas fa-bolt" style="color: #ff3366;"></i> Information Systems Specialist</div>
+                </div>
+                <div style="text-align: right; color: #a0a0b8; font-size: 0.92rem; line-height: 1.8;">
+                    <div><i class="fas fa-phone-alt" style="color: #ff3366; width: 1.4rem;"></i> +255 679 950 563</div>
+                    <div><i class="fas fa-envelope" style="color: #ff3366; width: 1.4rem;"></i> benjaminiw379@gmail.com</div>
+                    <div><i class="fas fa-location-dot" style="color: #ff3366; width: 1.4rem;"></i> Dodoma, Tanzania</div>
+                    <div><i class="fab fa-github" style="color: #ff3366; width: 1.4rem;"></i> github.com/Firstborn-tz</div>
+                </div>
+            </div>
+
+            <!-- Profile -->
+            <div style="background: rgba(255,51,102,0.04); border-radius: 16px; padding: 0.8rem 1.6rem; margin-bottom: 1.5rem; border-left: 4px solid #ff3366;">
+                <p style="margin: 0; color: #c0d0da; font-size: 0.95rem;"><i class="fas fa-quote-left" style="color: #ff3366; margin-right: 0.6rem;"></i> Background in Information Systems with hands-on experience in UI/UX design, web development, and data analysis. Passionate about building digital solutions that are functional and human‑centered. Strong leadership and communication skills, bridging technical teams and business goals.</p>
+            </div>
+
+            <!-- Two columns -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <!-- Left -->
+                <div>
+                    <h3 style="color: #ff3366; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.3rem; font-size: 1.05rem;"><i class="fas fa-briefcase" style="color: #ff3366;"></i> Experience</h3>
+                    <div style="margin-top: 0.6rem;">
+                        <strong style="color: #d0e4ec;">Lushtoto District Council</strong>
+                        <span style="color: #6b6b80; font-size: 0.82rem; display: block;">Information Systems Department</span>
+                        <ul style="list-style: none; padding-left: 0.2rem; color: #b0c0d0; font-size: 0.88rem;">
+                            <li><i class="fas fa-chevron-right" style="color: #ff3366; font-size: 0.6rem; margin-right: 0.4rem;"></i> Networking infrastructure development &amp; maintenance</li>
+                            <li><i class="fas fa-chevron-right" style="color: #ff3366; font-size: 0.6rem; margin-right: 0.4rem;"></i> Lead &amp; mentor troubleshooting teams</li>
+                            <li><i class="fas fa-chevron-right" style="color: #ff3366; font-size: 0.6rem; margin-right: 0.4rem;"></i> Monitor infrastructure consistency</li>
+                        </ul>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <strong style="color: #d0e4ec;">University of Dodoma (UDOM)</strong>
+                        <span style="color: #6b6b80; font-size: 0.82rem; display: block;">Industrial Practical Training</span>
+                        <ul style="list-style: none; padding-left: 0.2rem; color: #b0c0d0; font-size: 0.88rem;">
+                            <li><i class="fas fa-chevron-right" style="color: #ff3366; font-size: 0.6rem; margin-right: 0.4rem;"></i> Full project development: title to implementation</li>
+                            <li><i class="fas fa-chevron-right" style="color: #ff3366; font-size: 0.6rem; margin-right: 0.4rem;"></i> Complete system building &amp; deployment</li>
+                        </ul>
+                    </div>
+
+                    <h3 style="color: #ff3366; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.3rem; margin-top: 1.5rem; font-size: 1.05rem;"><i class="fas fa-graduation-cap" style="color: #ff3366;"></i> Education</h3>
+                    <div style="margin-top: 0.4rem;">
+                        <strong style="color: #d0e4ec;">BSc Information Systems</strong>
+                        <span style="color: #6b6b80; font-size: 0.82rem; display: block;">University of Dodoma (2023-2026)</span>
+                    </div>
+                    <div style="margin-top: 0.3rem;">
+                        <strong style="color: #d0e4ec;">Advanced Level (Div II)</strong>
+                        <span style="color: #6b6b80; font-size: 0.82rem; display: block;">Bihawana SS, Dodoma</span>
+                    </div>
+                    <div style="margin-top: 0.3rem;">
+                        <strong style="color: #d0e4ec;">Secondary (Div II)</strong>
+                        <span style="color: #6b6b80; font-size: 0.82rem; display: block;">Malibwi SS</span>
+                    </div>
+                </div>
+
+                <!-- Right -->
+                <div>
+                    <h3 style="color: #ff3366; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.3rem; font-size: 1.05rem;"><i class="fas fa-cogs" style="color: #ff3366;"></i> Skills</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.3rem 0.6rem; margin-top: 0.4rem;">
+                        <span style="background: rgba(255,51,102,0.06); padding: 0.15rem 0.8rem; border-radius: 30px; font-size: 0.78rem; color: #c0d0da; border: 1px solid rgba(255,51,102,0.08);">Python · Java</span>
+                        <span style="background: rgba(255,51,102,0.06); padding: 0.15rem 0.8rem; border-radius: 30px; font-size: 0.78rem; color: #c0d0da; border: 1px solid rgba(255,51,102,0.08);">SQL · DBMS</span>
+                        <span style="background: rgba(255,51,102,0.06); padding: 0.15rem 0.8rem; border-radius: 30px; font-size: 0.78rem; color: #c0d0da; border: 1px solid rgba(255,51,102,0.08);">Data Analysis</span>
+                        <span style="background: rgba(255,51,102,0.06); padding: 0.15rem 0.8rem; border-radius: 30px; font-size: 0.78rem; color: #c0d0da; border: 1px solid rgba(255,51,102,0.08);">Machine Learning</span>
+                        <span style="background: rgba(255,51,102,0.06); padding: 0.15rem 0.8rem; border-radius: 30px; font-size: 0.78rem; color: #c0d0da; border: 1px solid rgba(255,51,102,0.08);">Ethical Hacking</span>
+                        <span style="background: rgba(255,51,102,0.06); padding: 0.15rem 0.8rem; border-radius: 30px; font-size: 0.78rem; color: #c0d0da; border: 1px solid rgba(255,51,102,0.08);">Linux/Networking</span>
+                        <span style="background: rgba(255,51,102,0.06); padding: 0.15rem 0.8rem; border-radius: 30px; font-size: 0.78rem; color: #c0d0da; border: 1px solid rgba(255,51,102,0.08);">UI/UX Design</span>
+                        <span style="background: rgba(255,51,102,0.06); padding: 0.15rem 0.8rem; border-radius: 30px; font-size: 0.78rem; color: #c0d0da; border: 1px solid rgba(255,51,102,0.08);">Project Management</span>
+                        <span style="background: rgba(255,51,102,0.06); padding: 0.15rem 0.8rem; border-radius: 30px; font-size: 0.78rem; color: #c0d0da; border: 1px solid rgba(255,51,102,0.08);">E‑Governance</span>
+                        <span style="background: rgba(255,51,102,0.06); padding: 0.15rem 0.8rem; border-radius: 30px; font-size: 0.78rem; color: #c0d0da; border: 1px solid rgba(255,51,102,0.08);">Digital Marketing</span>
+                        <span style="background: rgba(255,51,102,0.06); padding: 0.15rem 0.8rem; border-radius: 30px; font-size: 0.78rem; color: #c0d0da; border: 1px solid rgba(255,51,102,0.08);">Leadership</span>
+                        <span style="background: rgba(255,51,102,0.06); padding: 0.15rem 0.8rem; border-radius: 30px; font-size: 0.78rem; color: #c0d0da; border: 1px solid rgba(255,51,102,0.08);">Research Methods</span>
+                    </div>
+
+                    <h3 style="color: #ff3366; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.3rem; margin-top: 1.5rem; font-size: 1.05rem;"><i class="fas fa-certificate" style="color: #ff3366;"></i> Certificates</h3>
+                    <ul style="list-style: none; padding-left: 0; color: #b0c0d0; font-size: 0.88rem;">
+                        <li><i class="fas fa-check-circle" style="color: #2ecc71; font-size: 0.7rem; margin-right: 0.4rem;"></i> AI Fundamentals – Google</li>
+                        <li><i class="fas fa-check-circle" style="color: #2ecc71; font-size: 0.7rem; margin-right: 0.4rem;"></i> Machine Learning with Python – IBM</li>
+                        <li><i class="fas fa-check-circle" style="color: #2ecc71; font-size: 0.7rem; margin-right: 0.4rem;"></i> Python for Data Science, AI &amp; Dev – IBM</li>
+                        <li><i class="fas fa-check-circle" style="color: #2ecc71; font-size: 0.7rem; margin-right: 0.4rem;"></i> Foundations: Data, Data, Everywhere – Google</li>
+                        <li><i class="fas fa-check-circle" style="color: #2ecc71; font-size: 0.7rem; margin-right: 0.4rem;"></i> Visualize Data using PowerPoint – Coursera</li>
+                        <li><i class="fas fa-check-circle" style="color: #2ecc71; font-size: 0.7rem; margin-right: 0.4rem;"></i> Getting Started with Excel – Coursera</li>
+                        <li><i class="fas fa-check-circle" style="color: #2ecc71; font-size: 0.7rem; margin-right: 0.4rem;"></i> Ethically Hack the Planet – Cyber</li>
+                    </ul>
+
+                    <h3 style="color: #ff3366; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.3rem; margin-top: 1.5rem; font-size: 1.05rem;"><i class="fas fa-language" style="color: #ff3366;"></i> Languages</h3>
+                    <div style="display: flex; gap: 1.8rem; font-size: 0.92rem; color: #b0c0d0;">
+                        <span><strong style="color: #d0e4ec;">English</strong> · Fluent</span>
+                        <span><strong style="color: #d0e4ec;">Kiswahili</strong> · Basic</span>
+                    </div>
+
+                    <h3 style="color: #ff3366; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 0.3rem; margin-top: 1.5rem; font-size: 1.05rem;"><i class="fas fa-rocket" style="color: #ff3366;"></i> Project</h3>
+                    <div style="color: #b0c0d0; font-size: 0.92rem;">
+                        <strong style="color: #d0e4ec;">Smart Home Cleaner Request Management System</strong>
+                        <div style="font-size: 0.82rem; color: #6b6b80;">Full-stack system · UI/UX + backend · <i class="fab fa-github"></i> Firstborn-tz</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 2rem; padding-top: 1rem; text-align: center; color: #4a5a6a; font-size: 0.78rem; letter-spacing: 0.5px;">
+                <i class="far fa-copyright"></i> 2026 Wilson Benjamini · Information Systems Specialist
+            </div>
+        </div>
+    </div>
+
     <script>
-    // ============ GEMINI AI - FIXED CONFIGURATION ============
+    // ============ GEMINI AI ============
     const GEMINI_API_KEY = 'AIzaSyAb8RN6JnrAGUS84H0YHHePxBUWRtihbqNuJE3WTFI6MLr6TPWw';
     const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_API_KEY;
     
-    const WILSON_PROMPT = `You are a helpful AI assistant on Wilson Benjamini's portfolio website. 
+    const WILSON_PROMPT = `You are a helpful AI assistant on Wilson Benjamini's portfolio website.
 
 ABOUT WILSON:
-- UI/UX Designer and System Analyst from Dodoma, Tanzania
-- Email: benjaminiw379@gmail.com | Phone: +255 799 505 563
-- Skills: HTML5, CSS3, JavaScript, React, Python, AWS, MongoDB, PostgreSQL, Git, Laravel, Alpine.js
-- Experience: Frontend Developer (2026-Present) building enterprise SaaS for 50K+ users
-- Education: B.S. Information Systems (2023-2026)
-- Languages: English and Swahili
-- GitHub: github.com/Firstborn-tz
-- 2+ years experience in web development with AI integration
+- Full Name: Wilson Benjamini Kibavu
+- Title: Information Systems Specialist | UI/UX Designer & System Analyst
+- Location: Dodoma, Tanzania
+- Email: benjaminiw379@gmail.com | Phone: +255 679 950 563
+- Education: BSc Information Systems, University of Dodoma (2023-2026)
+- Advanced Level: Bihawana SS (Div II)
+- Secondary: Malibwi SS (Div II)
 
-Answer questions about Wilson using the above info. For other topics, provide helpful answers. Keep responses friendly and concise.`;
+SKILLS:
+- Programming: Python, Java, HTML5, CSS3, JavaScript, OOP, Internet Programming, Mobile App Development
+- Data & Analytics: Data Analysis, Machine Learning, SQL, DBMS, Business Intelligence, Data Visualization, Statistical Modeling
+- Cybersecurity: Ethical Hacking, IT Security, Network Security, IT Governance
+- Systems: Linux/Unix, Networking, Systems Analysis, Database Systems, Enterprise Systems
+- Business: Information Systems Strategy, E-Governance, Decision Support, Project Management, ICT Entrepreneurship
+- Design: UI/UX Design, Human-Centered Design, User Research
+- Soft: Leadership, Communication, Problem Solving, Digital Marketing
+
+CERTIFICATES:
+- Google AI Fundamentals
+- IBM Machine Learning with Python
+- IBM Python for Data Science, AI & Development
+- Google Foundations: Data, Data, Everywhere
+- Coursera: Visualize Data with PowerPoint
+- Coursera: Getting Started with Excel
+- Ethically Hack the Planet (Ethical Hacking)
+
+EXPERIENCE:
+- Lushtoto District Council: Developed and maintained networking infrastructure, led troubleshooting, monitored infrastructure.
+- University of Dodoma (UDOM): Industrial Practical Training — full project development from title to implementation.
+
+PROJECTS:
+- Smart Home Cleaner Request Management System: Full-stack system for managing smart home cleaning requests. Built with Python, JavaScript, SQL.
+
+LANGUAGES: English (Fluent), Kiswahili (Basic)
+
+Answer questions about Wilson using the above info. For other topics, provide helpful answers. Keep responses friendly, concise, and professional.`;
 
     async function getGeminiResponse(userMessage) {
-        console.log('Sending to Gemini:', userMessage);
-        
         const requestBody = {
-            contents: [
-                {
-                    parts: [
-                        {
-                            text: WILSON_PROMPT + '\n\nUser: ' + userMessage + '\n\nAssistant:'
-                        }
-                    ]
-                }
-            ]
+            contents: [{ parts: [{ text: WILSON_PROMPT + '\n\nUser: ' + userMessage + '\n\nAssistant:' }] }]
         };
-        
-        console.log('Request body:', JSON.stringify(requestBody, null, 2));
 
         try {
             const response = await fetch(GEMINI_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
             });
 
-            console.log('Response status:', response.status);
-
             if (!response.ok) {
                 const errorData = await response.json();
-                console.error('Full error response:', errorData);
-                
-                // Check if the API key is invalid
                 if (errorData.error && errorData.error.code === 400) {
-                    return 'The AI service is currently unavailable. This might be due to API key restrictions. Please check that your API key is valid and has the Gemini API enabled. Error: ' + (errorData.error.message || 'Bad Request');
+                    return 'The AI service is currently unavailable. Please try again later.';
                 }
-                
-                return 'AI service error (Code: ' + response.status + '). ' + (errorData.error?.message || 'Please try again.');
+                return 'AI service error (Code: ' + response.status + '). Please try again.';
             }
 
             const data = await response.json();
-            console.log('API Response:', data);
-
             if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
                 return data.candidates[0].content.parts[0].text;
-            } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                return data.candidates[0].content.parts[0].text;
-            } else {
-                console.error('No valid response:', JSON.stringify(data));
-                return 'I received a response but could not extract the text. Please try again.';
             }
+            return 'I received a response but could not extract the text. Please try again.';
         } catch (error) {
-            console.error('Fetch error:', error);
-            return 'Network error: ' + error.message + '. Please check your connection.';
+            return 'Network error. Please check your connection.';
         }
     }
 
-    // ============ FALLBACK: Local AI if API fails ============
+    // ============ FALLBACK: Local AI ============
     function getLocalResponse(question) {
         const q = question.toLowerCase();
-        
         if (q.includes('skill') || q.includes('tech') || q.includes('know')) {
-            return 'Wilson has the following skills: HTML5, CSS3, JavaScript, React, Python, AWS, MongoDB, PostgreSQL, Git, Laravel, and Alpine.js. He specializes in Laravel ecosystem and Alpine.js for building performant web applications.';
+            return 'Wilson has skills in: Python, Java, SQL, HTML/CSS, JavaScript, Data Analysis, Machine Learning, Ethical Hacking, Networking, Systems Analysis, Project Management, UI/UX Design, Digital Marketing, and Leadership.';
         }
         if (q.includes('experience') || q.includes('work') || q.includes('job')) {
-            return 'Wilson works as a Frontend Developer (2026-Present) where he leads development of enterprise SaaS platform serving 50K+ users. He implemented micro-frontend architecture improving deployment time by 60%.';
+            return 'Wilson worked at Lushtoto District Council developing networking infrastructure and leading troubleshooting. He also completed Industrial Practical Training at UDOM where he built a full project from scratch.';
+        }
+        if (q.includes('course') || q.includes('study') || q.includes('learn')) {
+            return 'Wilson completed over 40 courses including: Programming, Databases, Networking, Security, Data Science, Business Systems, Research, and Management. He earned a BSc in Information Systems from UDOM.';
         }
         if (q.includes('project') || q.includes('portfolio')) {
-            return 'Wilson has worked on a Data Visualization Platform - a real-time analytics dashboard with interactive charts built using D3.js and Python.';
+            return 'Wilson built a Smart Home Cleaner Request Management System — a full-stack application using Python, JavaScript, and SQL. You can find it on his GitHub.';
         }
         if (q.includes('contact') || q.includes('email') || q.includes('phone') || q.includes('reach')) {
-            return 'You can contact Wilson via:\n- Email: benjaminiw379@gmail.com\n- Phone: +255 799 505 563\n- GitHub: github.com/Firstborn-tz\n- LinkedIn: linkedin.com/feed/';
+            return 'You can contact Wilson via:\n- Email: benjaminiw379@gmail.com\n- Phone: +255 679 950 563\n- GitHub: github.com/Firstborn-tz';
         }
-        if (q.includes('education') || q.includes('study') || q.includes('degree')) {
-            return 'Wilson earned his B.S. in Information Systems (2023-2026), specializing in software engineering and systems analysis.';
+        if (q.includes('certificate') || q.includes('cert')) {
+            return 'Wilson holds certificates from Google (AI Fundamentals, Data Foundations), IBM (ML with Python, Python for Data Science), Coursera (PowerPoint Visualization, Excel), and Ethically Hack the Planet.';
         }
-        if (q.includes('location') || q.includes('where') || q.includes('live')) {
-            return 'Wilson is based in Dodoma, Tanzania. He is Tanzanian and speaks both English and Swahili.';
-        }
-        if (q.includes('about') || q.includes('who')) {
-            return 'Wilson Benjamini is a passionate UI/UX Designer and System Analyst with 2+ years of experience crafting beautiful web applications integrated with AI.';
+        if (q.includes('education') || q.includes('degree')) {
+            return 'Wilson earned his BSc in Information Systems from the University of Dodoma. He also completed Advanced Level at Bihawana SS and Secondary at Malibwi SS.';
         }
         if (q.includes('hello') || q.includes('hi') || q.includes('hey')) {
-            return 'Hello! I can tell you about Wilson\'s skills, experience, projects, education, or how to contact him. What would you like to know?';
+            return 'Hello! I can tell you about Wilson\'s skills, experience, courses, certificates, projects, or how to contact him. What would you like to know?';
         }
-        
-        return 'I can answer questions about Wilson\'s skills, experience, projects, education, and contact info. Try asking: "What skills does Wilson have?" or "How can I contact Wilson?"';
+        return 'I can answer questions about Wilson\'s skills, experience, courses, certificates, projects, education, and contact info. Try asking: "What skills does Wilson have?" or "How can I contact Wilson?"';
     }
 
     // ============ CHAT FUNCTIONS ============
@@ -684,20 +909,13 @@ Answer questions about Wilson using the above info. For other topics, provide he
         const input = document.getElementById('chatInput');
         const message = input.value.trim();
         if (!message) return;
-        
         addChatMessage(message, 'user');
         input.value = '';
         showTyping();
-        
-        // Try Gemini API first, fallback to local if it fails
         let response = await getGeminiResponse(message);
-        
-        // If API fails, use local responses
-        if (response.includes('unavailable') || response.includes('error') || response.includes('Error') || response.includes('400') || response.includes('Network')) {
-            console.log('API failed, using local fallback');
+        if (response.includes('unavailable') || response.includes('error') || response.includes('Network')) {
             response = getLocalResponse(message);
         }
-        
         removeTyping();
         addChatMessage(response, 'bot');
     }
@@ -705,13 +923,10 @@ Answer questions about Wilson using the above info. For other topics, provide he
     async function quickAsk(question) {
         addChatMessage(question, 'user');
         showTyping();
-        
         let response = await getGeminiResponse(question);
-        
-        if (response.includes('unavailable') || response.includes('error') || response.includes('Error') || response.includes('400') || response.includes('Network')) {
+        if (response.includes('unavailable') || response.includes('error') || response.includes('Network')) {
             response = getLocalResponse(question);
         }
-        
         removeTyping();
         addChatMessage(response, 'bot');
     }
@@ -783,10 +998,50 @@ Answer questions about Wilson using the above info. For other topics, provide he
         });
     });
 
-    // Test API on load
-    console.log('Portfolio loaded. API Key length:', GEMINI_API_KEY.length);
-    console.log('Testing Gemini API...');
-    getGeminiResponse('Hello').then(r => console.log('Test response:', r.substring(0, 100)));
-</script>
+    // ============ PDF CV DOWNLOAD ============
+    document.getElementById('downloadCvBtn').addEventListener('click', function() {
+        const loader = document.getElementById('loaderOverlay');
+        const cvElement = document.getElementById('cvContent');
+
+        if (!cvElement) {
+            alert('CV content not found.');
+            return;
+        }
+
+        loader.classList.add('active');
+
+        // Clone the CV content for PDF generation
+        const clone = cvElement.cloneNode(true);
+        clone.style.display = 'block';
+        clone.style.position = 'fixed';
+        clone.style.left = '-9999px';
+        clone.style.top = '0';
+        clone.style.width = '900px';
+        clone.style.background = '#12121a';
+        clone.style.padding = '2rem';
+        clone.style.zIndex = '-1';
+        document.body.appendChild(clone);
+
+        const opt = {
+            margin: 0.5,
+            filename: 'Wilson_Benjamini_CV.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, backgroundColor: '#12121a', letterRendering: true },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(clone).save().then(function() {
+            document.body.removeChild(clone);
+            loader.classList.remove('active');
+        }).catch(function(err) {
+            console.error('PDF generation error:', err);
+            document.body.removeChild(clone);
+            loader.classList.remove('active');
+            alert('⚠️ There was an error generating the PDF. Please try again.');
+        });
+    });
+
+    console.log('Portfolio loaded successfully!');
+    </script>
 </body>
 </html>
